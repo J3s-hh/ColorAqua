@@ -132,6 +132,22 @@
             color: #495057;
             border: 2px solid #dee2e6;
         }
+        
+        .btn-flash {
+            background: #fef3c7;
+            color: #92400e;
+            border: 2px solid #fcd34d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .btn-flash.on {
+            background: #f59e0b;
+            color: white;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+        }
 
         .btn:hover {
             transform: translateY(-2px);
@@ -323,6 +339,21 @@
             background: #667eea;
             color: white;
         }
+        
+        .flash-supported {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .flash-unsupported {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #ef4444;
+            display: none;
+        }
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -388,6 +419,11 @@
                 margin-top: 10px;
                 order: 3;
             }
+            
+            .btn {
+                padding: 10px 15px;
+                min-width: 100px;
+            }
         }
 
         @media (max-width: 480px) and (orientation: landscape) {
@@ -396,7 +432,7 @@
             }
             
             .btn {
-                padding: 10px 15px;
+                padding: 8px 12px;
                 font-size: 12px;
                 min-width: 90px;
             }
@@ -430,7 +466,11 @@
             <div class="controls">
                 <button class="btn btn-primary" id="captureBtn">🔬 Analyze Sample</button>
                 <button class="btn btn-secondary" id="retakeBtn" style="display: none;">📷 New Sample</button>
+                <button class="btn btn-flash" id="flashBtn">🔦 Flash Off</button>
             </div>
+            
+            <p class="flash-supported" id="flashSupported">Flashlight feature available</p>
+            <p class="flash-unsupported" id="flashUnsupported">Flashlight not supported on your device/browser</p>
             
             <div class="detected-colors" id="colorPills">
                 <div class="color-pill">Red</div>
@@ -464,6 +504,9 @@
     <script>
         let video, canvas, context;
         let stream = null;
+        let flashEnabled = false;
+        let track = null;
+        let flashSupported = true;
 
         // Scientific database with real correlations
         const scientificData = {
@@ -499,6 +542,17 @@
             video = document.getElementById('video');
             
             try {
+                // Check if flash is supported
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const hasFlash = devices.some(device => device.label.toLowerCase().includes('flash'));
+                
+                if (!hasFlash) {
+                    flashSupported = false;
+                    document.getElementById('flashSupported').style.display = 'none';
+                    document.getElementById('flashUnsupported').style.display = 'block';
+                    document.getElementById('flashBtn').style.display = 'none';
+                }
+                
                 // Using exact same camera settings that work
                 stream = await navigator.mediaDevices.getUserMedia({
                     video: {
@@ -510,9 +564,43 @@
                 
                 video.srcObject = stream;
                 document.getElementById('overlay').style.display = 'flex';
+                
+                // Get the video track for flash control
+                track = stream.getVideoTracks()[0];
+                
             } catch (error) {
                 console.error('Camera access denied:', error);
                 document.getElementById('overlay').innerHTML = '<div>Camera access required<br>Please allow camera permissions</div>';
+            }
+        }
+
+        async function toggleFlash() {
+            if (!track || !flashSupported) return;
+            
+            try {
+                if (flashEnabled) {
+                    // Turn flash off
+                    await track.applyConstraints({
+                        advanced: [{ torch: false }]
+                    });
+                    flashEnabled = false;
+                    document.getElementById('flashBtn').classList.remove('on');
+                    document.getElementById('flashBtn').innerHTML = '🔦 Flash Off';
+                } else {
+                    // Turn flash on
+                    await track.applyConstraints({
+                        advanced: [{ torch: true }]
+                    });
+                    flashEnabled = true;
+                    document.getElementById('flashBtn').classList.add('on');
+                    document.getElementById('flashBtn').innerHTML = '🔦 Flash On';
+                }
+            } catch (error) {
+                console.error('Error toggling flash:', error);
+                flashSupported = false;
+                document.getElementById('flashSupported').style.display = 'none';
+                document.getElementById('flashUnsupported').style.display = 'block';
+                document.getElementById('flashBtn').style.display = 'none';
             }
         }
 
@@ -736,14 +824,21 @@
             highlightDetectedColor(analysis.colorCategory);
         }
 
-        // Event listeners using exact same working code structure
+        // Event listeners
         document.getElementById('captureBtn').addEventListener('click', async () => {
             if (!video.srcObject) {
                 alert('Camera not available');
                 return;
             }
             
-            // Create canvas and capture image - same as working version
+            // Turn off flash during capture to prevent overexposure
+            if (flashEnabled && track && flashSupported) {
+                await track.applyConstraints({
+                    advanced: [{ torch: false }]
+                });
+            }
+            
+            // Create canvas and capture image
             canvas = document.createElement('canvas');
             context = canvas.getContext('2d');
             canvas.width = video.videoWidth;
@@ -752,7 +847,7 @@
             
             const imageData = canvas.toDataURL('image/jpeg');
             
-            // Show preview - same as working version
+            // Show preview
             const preview = document.getElementById('preview');
             preview.src = imageData;
             preview.style.display = 'block';
@@ -762,11 +857,20 @@
             document.getElementById('captureBtn').style.display = 'none';
             document.getElementById('retakeBtn').style.display = 'block';
             
-            // Show results section with loading - same as working version
+            // Show results section with loading
             const results = document.getElementById('results');
             results.classList.add('show');
             document.getElementById('loading').style.display = 'block';
             document.getElementById('analysis').style.display = 'none';
+            
+            // Turn flash back on if it was enabled
+            if (flashEnabled && track && flashSupported) {
+                setTimeout(async () => {
+                    await track.applyConstraints({
+                        advanced: [{ torch: true }]
+                    });
+                }, 100);
+            }
             
             // Analyze with enhanced scientific method
             setTimeout(async () => {
@@ -788,7 +892,9 @@
             colorPills.forEach(pill => pill.classList.remove('active'));
         });
 
-        // Initialize camera on page load - same as working version
+        document.getElementById('flashBtn').addEventListener('click', toggleFlash);
+
+        // Initialize camera on page load
         window.addEventListener('load', initCamera);
     </script>
 </body>
