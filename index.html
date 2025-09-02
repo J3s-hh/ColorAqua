@@ -53,6 +53,101 @@
             flex-direction: column;
         }
 
+        .mode-selector {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .mode-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .mode-btn {
+            padding: 12px 20px;
+            border: 2px solid #667eea;
+            border-radius: 50px;
+            background: white;
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .test-selector {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .test-selector.show {
+            display: block;
+        }
+
+        .test-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .test-btn {
+            padding: 15px 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            color: #475569;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .test-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .test-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .test-btn.completed {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 8px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
         .camera-section {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
@@ -61,6 +156,25 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
+        }
+
+        .current-test-info {
+            background: #f0f9ff;
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .current-test-info h3 {
+            color: #1e40af;
+            margin-bottom: 5px;
+        }
+
+        .current-test-info p {
+            color: #475569;
+            font-size: 13px;
         }
 
         .camera-container {
@@ -173,90 +287,96 @@
             animation: slideUp 0.5s ease;
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .color-display {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            padding: 15px;
+        .individual-result {
             background: #f8f9fa;
             border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #10b981;
         }
 
-        .color-sample {
-            width: 60px;
-            height: 60px;
+        .individual-result h4 {
+            color: #059669;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .result-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .color-sample-small {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            border: 3px solid #dee2e6;
-            flex-shrink: 0;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border: 2px solid #dee2e6;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .color-info h3 {
-            color: #495057;
-            font-size: 16px;
-            margin-bottom: 5px;
+        .result-info p {
+            margin: 5px 0;
+            font-size: 13px;
+            color: #475569;
         }
 
-        .color-info p {
-            color: #6c757d;
-            font-size: 12px;
+        .final-summary {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            display: none;
+            margin-top: 15px;
         }
 
-        .parameter-grid {
+        .final-summary.show {
+            display: block;
+            animation: slideUp 0.5s ease;
+        }
+
+        .summary-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
             margin-bottom: 20px;
         }
 
-        .parameter-card {
+        .summary-card {
             background: #f8f9fa;
             border-radius: 12px;
             padding: 15px;
-            border-left: 4px solid #667eea;
-            transition: all 0.3s ease;
+            text-align: center;
+            border: 2px solid #e2e8f0;
         }
 
-        .parameter-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
+        .summary-card.excellent { border-color: #10b981; }
+        .summary-card.good { border-color: #059669; }
+        .summary-card.fair { border-color: #f59e0b; }
+        .summary-card.poor { border-color: #ef4444; }
 
-        .parameter-card h4 {
-            color: #495057;
-            font-size: 14px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .parameter-value {
-            font-size: 22px;
+        .summary-value {
+            font-size: 20px;
             font-weight: 700;
-            margin-bottom: 5px;
-            color: #495057;
+            margin: 8px 0;
+            color: #374151;
         }
 
-        .parameter-range {
-            font-size: 11px;
-            color: #6c757d;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            font-weight: 600;
+        .overall-rating {
+            background: linear-gradient(135deg, #f0f9ff, #e0e7ff);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid;
         }
 
-        .parameter-desc {
-            font-size: 12px;
-            color: #6c757d;
-            line-height: 1.4;
-        }
+        .overall-rating.excellent { border-color: #10b981; }
+        .overall-rating.good { border-color: #059669; }
+        .overall-rating.fair { border-color: #f59e0b; }
+        .overall-rating.poor { border-color: #ef4444; }
 
         .quality-badge {
             display: inline-block;
@@ -272,25 +392,6 @@
         .quality-good { background: #dcfce7; color: #166534; }
         .quality-fair { background: #fef3c7; color: #92400e; }
         .quality-poor { background: #fecaca; color: #991b1b; }
-
-        .scientific-summary {
-            background: linear-gradient(135deg, #f0f9ff, #e0e7ff);
-            border-radius: 12px;
-            padding: 15px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .scientific-summary h4 {
-            color: #1e40af;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .scientific-summary p {
-            color: #475569;
-            line-height: 1.6;
-            font-size: 12px;
-        }
 
         .disclaimer {
             background: rgba(255, 255, 255, 0.1);
@@ -318,46 +419,14 @@
             margin: 0 auto 15px;
         }
 
-        .detected-colors {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 15px 0;
-            justify-content: center;
-        }
-
-        .color-pill {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            background: #e2e8f0;
-            color: #475569;
-        }
-
-        .color-pill.active {
-            background: #667eea;
-            color: white;
-        }
-        
-        .flash-supported {
-            text-align: center;
-            margin-top: 10px;
-            font-size: 12px;
-            color: #6b7280;
-        }
-        
-        .flash-unsupported {
-            text-align: center;
-            margin-top: 10px;
-            font-size: 12px;
-            color: #ef4444;
-            display: none;
-        }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Landscape orientation adjustments */
@@ -376,9 +445,15 @@
                 margin-bottom: 0;
             }
             
-            .results {
+            .results, .final-summary {
                 width: 45%;
                 margin-left: 10px;
+            }
+            
+            .mode-selector, .test-selector {
+                width: 100%;
+                margin-bottom: 10px;
+                order: -1;
             }
             
             .header {
@@ -398,20 +473,9 @@
                 aspect-ratio: 4/3;
             }
             
-            .parameter-grid {
-                grid-template-columns: 1fr;
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
                 gap: 10px;
-            }
-            
-            .color-display {
-                flex-direction: column;
-                text-align: center;
-                padding: 10px;
-            }
-            
-            .color-sample {
-                width: 50px;
-                height: 50px;
             }
             
             .disclaimer {
@@ -427,7 +491,7 @@
         }
 
         @media (max-width: 480px) and (orientation: landscape) {
-            .camera-section, .results {
+            .camera-section, .results, .final-summary {
                 width: 48%;
             }
             
@@ -437,12 +501,8 @@
                 min-width: 90px;
             }
             
-            .parameter-card {
-                padding: 10px;
-            }
-            
-            .parameter-value {
-                font-size: 18px;
+            .summary-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -454,46 +514,102 @@
     </div>
 
     <div class="container">
+        <div class="mode-selector">
+            <h3 style="margin-bottom: 15px; color: #374151;">Select Testing Mode</h3>
+            <div class="mode-buttons">
+                <button class="mode-btn active" id="quickModeBtn">Quick Analysis</button>
+                <button class="mode-btn" id="individualModeBtn">Individual Tests</button>
+            </div>
+            <p style="font-size: 12px; color: #6b7280; margin-top: 10px;">
+                <span id="modeDescription">Test all parameters simultaneously</span>
+            </p>
+        </div>
+
+        <div class="test-selector" id="testSelector">
+            <h3 style="margin-bottom: 15px; color: #374151;">Select Parameter to Test</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p style="text-align: center; margin-bottom: 15px; font-size: 12px; color: #6b7280;">
+                Progress: <span id="progressText">0/4 tests completed</span>
+            </p>
+            
+            <div class="test-buttons">
+                <button class="test-btn" id="testPH" data-test="pH">
+                    🌡️<br>pH Level
+                </button>
+                <button class="test-btn" id="testIron" data-test="iron">
+                    🔶<br>Iron Content
+                </button>
+                <button class="test-btn" id="testSulfate" data-test="sulfate">
+                    ⚪<br>Sulfate
+                </button>
+                <button class="test-btn" id="testAmmonia" data-test="ammonia">
+                    💨<br>Ammonia
+                </button>
+            </div>
+            
+            <div style="text-align: center; margin-top: 15px;">
+                <button class="btn btn-primary" id="viewSummaryBtn" style="display: none;">
+                    📊 View Complete Summary
+                </button>
+                <button class="btn btn-secondary" id="resetTestsBtn" style="display: none;">
+                    🔄 Reset All Tests
+                </button>
+            </div>
+        </div>
+
         <div class="camera-section">
+            <div class="current-test-info" id="currentTestInfo" style="display: none;">
+                <h3 id="currentTestTitle">Testing: pH Level</h3>
+                <p id="currentTestDesc">Add pH indicator solution to test tube and observe color change</p>
+            </div>
+            
             <div class="camera-container">
                 <video id="video" autoplay muted playsinline></video>
                 <img id="preview" alt="Captured water sample">
                 <div class="camera-overlay" id="overlay">
-                    <div>Position water sample in frame<br><strong>Ensure good lighting for accurate analysis</strong></div>
+                    <div>Position test tube in frame<br><strong>Ensure good lighting for accurate analysis</strong></div>
                 </div>
             </div>
 
             <div class="controls">
                 <button class="btn btn-primary" id="captureBtn">🔬 Analyze Sample</button>
-                <button class="btn btn-secondary" id="retakeBtn" style="display: none;">📷 New Sample</button>
+                <button class="btn btn-secondary" id="retakeBtn" style="display: none;">📷 Retake</button>
                 <button class="btn btn-flash" id="flashBtn">🔦 Flash Off</button>
-            </div>
-            
-            <p class="flash-supported" id="flashSupported">Flashlight feature available</p>
-            <p class="flash-unsupported" id="flashUnsupported">Flashlight not supported on your device/browser</p>
-            
-            <div class="detected-colors" id="colorPills">
-                <div class="color-pill">Red</div>
-                <div class="color-pill">Orange</div>
-                <div class="color-pill">Yellow</div>
-                <div class="color-pill">Green</div>
-                <div class="color-pill">Blue</div>
-                <div class="color-pill">Purple</div>
-                <div class="color-pill">Brown</div>
-                <div class="color-pill">Clear</div>
-                <div class="color-pill">Gray</div>
-                <div class="color-pill">Black</div>
-                <div class="color-pill">White</div>
             </div>
         </div>
 
         <div class="results" id="results">
             <div class="loading" id="loading">
                 <div class="loading-spinner"></div>
-                <p><strong>Analyzing water composition...</strong></p>
-                <p style="margin-top: 10px; font-size: 11px; opacity: 0.7;">Processing color spectrum • Detecting chemical indicators • Generating scientific report</p>
+                <p><strong>Analyzing sample...</strong></p>
+                <p style="margin-top: 10px; font-size: 11px; opacity: 0.7;">Processing color spectrum • Detecting chemical indicators</p>
             </div>
             <div id="analysis" style="display: none;"></div>
+            <div id="individualResults"></div>
+        </div>
+
+        <div class="final-summary" id="finalSummary">
+            <h2 style="text-align: center; margin-bottom: 20px; color: #374151;">Complete Water Analysis Report</h2>
+            
+            <div class="summary-grid" id="summaryGrid">
+                <!-- Summary cards will be populated here -->
+            </div>
+            
+            <div class="overall-rating" id="overallRating">
+                <h3 style="margin-bottom: 10px;">Overall Water Quality</h3>
+                <div style="font-size: 32px; font-weight: 800; margin: 15px 0;" id="overallScore">
+                    <!-- Overall score will be populated -->
+                </div>
+                <p id="overallRecommendation">
+                    <!-- Recommendation will be populated -->
+                </p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-secondary" id="startOverBtn">🔄 Start New Analysis</button>
+            </div>
         </div>
     </div>
 
@@ -507,6 +623,33 @@
         let flashEnabled = false;
         let track = null;
         let flashSupported = true;
+        let currentMode = 'quick';
+        let currentTest = null;
+        let testResults = {};
+        let completedTests = 0;
+
+        const testInfo = {
+            pH: {
+                title: 'pH Level Test',
+                description: 'Add pH indicator solution to test tube and observe color change',
+                icon: '🌡️'
+            },
+            iron: {
+                title: 'Iron Content Test', 
+                description: 'Add iron indicator reagent to test tube and observe precipitation',
+                icon: '🔶'
+            },
+            sulfate: {
+                title: 'Sulfate Test',
+                description: 'Add sulfate reagent to test tube and observe turbidity/color',
+                icon: '⚪'
+            },
+            ammonia: {
+                title: 'Ammonia Test',
+                description: 'Add ammonia indicator solution and observe color development',
+                icon: '💨'
+            }
+        };
 
         // Scientific database with real correlations
         const scientificData = {
@@ -535,6 +678,20 @@
                 gray: { concentration: '0.5-2.0 mg/L', quality: 'fair', desc: 'Moderate iron content' },
                 black: { concentration: '5.0+ mg/L', quality: 'poor', desc: 'Very high iron or manganese content' },
                 white: { concentration: '<0.1 mg/L', quality: 'excellent', desc: 'No iron detected' }
+            },
+            sulfate: {
+                clear: { concentration: '50-150 mg/L', quality: 'excellent', desc: 'Normal sulfate levels' },
+                white: { concentration: '250-400 mg/L', quality: 'fair', desc: 'Elevated sulfates - visible precipitation' },
+                yellow: { concentration: '400-600 mg/L', quality: 'poor', desc: 'High sulfates - exceeds EPA guidelines' },
+                brown: { concentration: '600+ mg/L', quality: 'poor', desc: 'Very high sulfates - treatment required' },
+                gray: { concentration: '200-350 mg/L', quality: 'fair', desc: 'Moderate sulfate content' }
+            },
+            ammonia: {
+                clear: { concentration: '<0.1 mg/L', quality: 'excellent', desc: 'No ammonia detected' },
+                green: { concentration: '1.0-3.0 mg/L', quality: 'poor', desc: 'High ammonia - possible sewage contamination' },
+                blue: { concentration: '0.2-1.0 mg/L', quality: 'fair', desc: 'Moderate ammonia levels' },
+                yellow: { concentration: '0.5-1.5 mg/L', quality: 'fair', desc: 'Detectable ammonia - monitor source' },
+                purple: { concentration: '0.1-0.5 mg/L', quality: 'good', desc: 'Low ammonia levels' }
             }
         };
 
@@ -542,18 +699,6 @@
             video = document.getElementById('video');
             
             try {
-                // Check if flash is supported
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const hasFlash = devices.some(device => device.label.toLowerCase().includes('flash'));
-                
-                if (!hasFlash) {
-                    flashSupported = false;
-                    document.getElementById('flashSupported').style.display = 'none';
-                    document.getElementById('flashUnsupported').style.display = 'block';
-                    document.getElementById('flashBtn').style.display = 'none';
-                }
-                
-                // Using exact same camera settings that work
                 stream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         facingMode: { ideal: 'environment' },
@@ -564,8 +709,6 @@
                 
                 video.srcObject = stream;
                 document.getElementById('overlay').style.display = 'flex';
-                
-                // Get the video track for flash control
                 track = stream.getVideoTracks()[0];
                 
             } catch (error) {
@@ -579,18 +722,12 @@
             
             try {
                 if (flashEnabled) {
-                    // Turn flash off
-                    await track.applyConstraints({
-                        advanced: [{ torch: false }]
-                    });
+                    await track.applyConstraints({ advanced: [{ torch: false }] });
                     flashEnabled = false;
                     document.getElementById('flashBtn').classList.remove('on');
                     document.getElementById('flashBtn').innerHTML = '🔦 Flash Off';
                 } else {
-                    // Turn flash on
-                    await track.applyConstraints({
-                        advanced: [{ torch: true }]
-                    });
+                    await track.applyConstraints({ advanced: [{ torch: true }] });
                     flashEnabled = true;
                     document.getElementById('flashBtn').classList.add('on');
                     document.getElementById('flashBtn').innerHTML = '🔦 Flash On';
@@ -598,10 +735,49 @@
             } catch (error) {
                 console.error('Error toggling flash:', error);
                 flashSupported = false;
-                document.getElementById('flashSupported').style.display = 'none';
-                document.getElementById('flashUnsupported').style.display = 'block';
                 document.getElementById('flashBtn').style.display = 'none';
             }
+        }
+
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Update mode buttons
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(mode + 'ModeBtn').classList.add('active');
+            
+            // Show/hide test selector
+            const testSelector = document.getElementById('testSelector');
+            const currentTestInfo = document.getElementById('currentTestInfo');
+            
+            if (mode === 'individual') {
+                testSelector.classList.add('show');
+                document.getElementById('modeDescription').textContent = 'Test each parameter individually for detailed analysis';
+            } else {
+                testSelector.classList.remove('show');
+                currentTestInfo.style.display = 'none';
+                document.getElementById('modeDescription').textContent = 'Test all parameters simultaneously';
+            }
+            
+            // Reset any ongoing tests
+            resetCurrentTest();
+        }
+
+        function selectTest(testType) {
+            currentTest = testType;
+            
+            // Update test buttons
+            document.querySelectorAll('.test-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('test' + testType.charAt(0).toUpperCase() + testType.slice(1)).classList.add('active');
+            
+            // Show current test info
+            const info = testInfo[testType];
+            document.getElementById('currentTestInfo').style.display = 'block';
+            document.getElementById('currentTestTitle').innerHTML = `${info.icon} ${info.title}`;
+            document.getElementById('currentTestDesc').textContent = info.description;
+            
+            // Update overlay text
+            document.getElementById('overlay').innerHTML = `<div>Position ${testType.toUpperCase()} test tube in frame<br><strong>Ensure reagent is mixed and lighting is good</strong></div>`;
         }
 
         function determineColorCategory(r, g, b) {
@@ -609,23 +785,18 @@
             const maxColor = Math.max(r, g, b);
             const minColor = Math.min(r, g, b);
             const saturation = maxColor === 0 ? 0 : (maxColor - minColor) / maxColor;
-            const colorDiff = maxColor - minColor;
 
-            // First check for black, white and gray
             if (saturation < 0.1) {
                 if (brightness < 50) return 'black';
                 if (brightness > 200) return 'white';
                 return 'gray';
             }
             
-            // Clear/colorless water (light with low saturation)
             if (saturation < 0.15 && brightness > 180) return 'clear';
             
-            // Determine dominant color with better thresholds
             if (r > g + 40 && r > b + 40) {
-                // Check for brown (dark orange/red)
                 if (brightness < 120 && g > b && (r - g) < 60) return 'brown';
-                if (g > b + 20) return 'orange';  // Red + some green = orange
+                if (g > b + 20) return 'orange';
                 return 'red';
             } else if (g > r + 30 && g > b + 30) {
                 return 'green';
@@ -633,74 +804,20 @@
                 return 'blue';
             } else if (r > 150 && g > 120 && b < 100) {
                 return 'yellow';
-            } else if (r > g && b > g && colorDiff > 50) {
-                // Check for purple vs brown
+            } else if (r > g && b > g && (r - b) < 40) {
                 if (brightness < 130) return 'brown';
                 return 'purple';
-            } else if (r > 120 && g > 100 && b > 100 && Math.abs(r-g) < 30 && Math.abs(r-b) < 30) {
-                return 'gray';
             }
             
             return 'gray';
         }
 
-        function calculateScientificValues(colorCategory, r, g, b) {
-            // Get pH from scientific database
-            const pHData = scientificData.pH[colorCategory] || scientificData.pH.gray;
-            
-            // Get iron content
-            const ironData = scientificData.iron[colorCategory] || scientificData.iron.gray;
-            
-            // Calculate sulfate based on pH correlation (scientific relationship)
-            let sulfateValue, sulfateQuality, sulfateDesc;
-            if (pHData.value < 4) {
-                sulfateValue = '500-1500 mg/L';
-                sulfateQuality = 'poor';
-                sulfateDesc = 'High sulfates from acid mine drainage';
-            } else if (pHData.value < 6) {
-                sulfateValue = '250-500 mg/L';
-                sulfateQuality = 'fair';
-                sulfateDesc = 'Elevated sulfates - possible industrial influence';
-            } else {
-                sulfateValue = '50-250 mg/L';
-                sulfateQuality = 'good';
-                sulfateDesc = 'Normal sulfate levels';
+        function calculateParameterValue(testType, colorCategory, r, g, b) {
+            const data = scientificData[testType];
+            if (!data || !data[colorCategory]) {
+                return scientificData[testType]?.clear || scientificData[testType]?.gray || { value: 'Unknown', quality: 'fair', desc: 'Unable to determine' };
             }
-            
-            // Calculate ammonia based on color indicators
-            let ammoniaValue, ammoniaQuality, ammoniaDesc;
-            if (colorCategory === 'green' && g > r + 20) {
-                ammoniaValue = '1.0-3.0 mg/L';
-                ammoniaQuality = 'poor';
-                ammoniaDesc = 'Green tint suggests possible ammonia contamination';
-            } else if (colorCategory === 'blue') {
-                ammoniaValue = '0.2-1.0 mg/L';
-                ammoniaQuality = 'fair';
-                ammoniaDesc = 'Blue coloration may indicate low-level ammonia';
-            } else {
-                ammoniaValue = '<0.2 mg/L';
-                ammoniaQuality = 'good';
-                ammoniaDesc = 'No visible ammonia indicators';
-            }
-
-            return {
-                pH: pHData,
-                iron: ironData,
-                sulfate: { value: sulfateValue, quality: sulfateQuality, desc: sulfateDesc },
-                ammonia: { value: ammoniaValue, quality: ammoniaQuality, desc: ammoniaDesc },
-                colorCategory,
-                rgb: { r: Math.round(r), g: Math.round(g), b: Math.round(b) }
-            };
-        }
-
-        function highlightDetectedColor(colorCategory) {
-            const colorPills = document.querySelectorAll('.color-pill');
-            colorPills.forEach(pill => {
-                pill.classList.remove('active');
-                if (pill.textContent.toLowerCase() === colorCategory.toLowerCase()) {
-                    pill.classList.add('active');
-                }
-            });
+            return data[colorCategory];
         }
 
         function analyzeImage(imageData) {
@@ -714,14 +831,12 @@
                     canvas.height = img.height;
                     ctx.drawImage(img, 0, 0);
                     
-                    // Enhanced sampling - multiple regions
                     const centerX = img.width / 2;
                     const centerY = img.height / 2;
                     const sampleSize = 50;
                     
                     let totalR = 0, totalG = 0, totalB = 0, pixelCount = 0;
                     
-                    // Sample in a grid pattern for better accuracy
                     for (let x = centerX - sampleSize; x < centerX + sampleSize; x += 5) {
                         for (let y = centerY - sampleSize; y < centerY + sampleSize; y += 5) {
                             if (x >= 0 && x < img.width && y >= 0 && y < img.height) {
@@ -737,108 +852,227 @@
                     const avgR = totalR / pixelCount;
                     const avgG = totalG / pixelCount;
                     const avgB = totalB / pixelCount;
-                    
                     const colorCategory = determineColorCategory(avgR, avgG, avgB);
-                    const analysis = calculateScientificValues(colorCategory, avgR, avgG, avgB);
                     
-                    resolve(analysis);
+                    resolve({
+                        colorCategory,
+                        rgb: { r: Math.round(avgR), g: Math.round(avgG), b: Math.round(avgB) }
+                    });
                 };
                 img.src = imageData;
             });
         }
 
-        function displayResults(analysis) {
+        function displayQuickResults(analysis) {
+            // Calculate all parameters for quick mode
+            const allResults = {
+                pH: calculateParameterValue('pH', analysis.colorCategory, analysis.rgb.r, analysis.rgb.g, analysis.rgb.b),
+                iron: calculateParameterValue('iron', analysis.colorCategory, analysis.rgb.r, analysis.rgb.g, analysis.rgb.b),
+                sulfate: calculateParameterValue('sulfate', analysis.colorCategory, analysis.rgb.r, analysis.rgb.g, analysis.rgb.b),
+                ammonia: calculateParameterValue('ammonia', analysis.colorCategory, analysis.rgb.r, analysis.rgb.g, analysis.rgb.b)
+            };
+
             const resultsDiv = document.getElementById('analysis');
             const colorHex = `rgb(${analysis.rgb.r}, ${analysis.rgb.g}, ${analysis.rgb.b})`;
             
             resultsDiv.innerHTML = `
-                <div class="color-display">
-                    <div class="color-sample" style="background-color: ${colorHex};"></div>
-                    <div class="color-info">
-                        <h3>Detected: ${analysis.colorCategory.charAt(0).toUpperCase() + analysis.colorCategory.slice(1)} Water</h3>
-                        <p>RGB: (${analysis.rgb.r}, ${analysis.rgb.g}, ${analysis.rgb.b})</p>
-                        <p>Analysis timestamp: ${new Date().toLocaleString()}</p>
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 12px;">
+                    <div style="width: 60px; height: 60px; border-radius: 50%; border: 3px solid #dee2e6; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); background-color: ${colorHex};"></div>
+                    <div>
+                        <h3 style="color: #495057; font-size: 16px; margin-bottom: 5px;">Detected: ${analysis.colorCategory.charAt(0).toUpperCase() + analysis.colorCategory.slice(1)} Water</h3>
+                        <p style="color: #6c757d; font-size: 12px;">RGB: (${analysis.rgb.r}, ${analysis.rgb.g}, ${analysis.rgb.b})</p>
                     </div>
                 </div>
 
-                <div class="parameter-grid">
-                    <div class="parameter-card">
-                        <h4>🌡️ pH Level</h4>
-                        <div class="parameter-value">${analysis.pH.value}</div>
-                        <div class="parameter-range">Range: ${analysis.pH.range}</div>
-                        <div class="parameter-desc">${analysis.pH.desc}</div>
-                        <span class="quality-badge quality-${analysis.pH.quality}">
-                            ${analysis.pH.quality.toUpperCase()}
-                        </span>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <div style="background: #f8f9fa; border-radius: 12px; padding: 15px; border-left: 4px solid #667eea;">
+                        <h4 style="color: #495057; font-size: 14px; margin-bottom: 8px;">🌡️ pH Level</h4>
+                        <div style="font-size: 22px; font-weight: 700; margin-bottom: 5px; color: #495057;">${allResults.pH.value}</div>
+                        <span class="quality-badge quality-${allResults.pH.quality}">${allResults.pH.quality.toUpperCase()}</span>
                     </div>
 
-                    <div class="parameter-card">
-                        <h4>🔶 Iron Content</h4>
-                        <div class="parameter-value">${analysis.iron.concentration}</div>
-                        <div class="parameter-range">EPA Limit: 0.3 mg/L</div>
-                        <div class="parameter-desc">${analysis.iron.desc}</div>
-                        <span class="quality-badge quality-${analysis.iron.quality}">
-                            ${analysis.iron.quality.toUpperCase()}
-                        </span>
+                    <div style="background: #f8f9fa; border-radius: 12px; padding: 15px; border-left: 4px solid #667eea;">
+                        <h4 style="color: #495057; font-size: 14px; margin-bottom: 8px;">🔶 Iron</h4>
+                        <div style="font-size: 22px; font-weight: 700; margin-bottom: 5px; color: #495057;">${allResults.iron.concentration}</div>
+                        <span class="quality-badge quality-${allResults.iron.quality}">${allResults.iron.quality.toUpperCase()}</span>
                     </div>
 
-                    <div class="parameter-card">
-                        <h4>⚪ Sulfate Estimate</h4>
-                        <div class="parameter-value">${analysis.sulfate.value}</div>
-                        <div class="parameter-range">EPA Limit: 250 mg/L</div>
-                        <div class="parameter-desc">${analysis.sulfate.desc}</div>
-                        <span class="quality-badge quality-${analysis.sulfate.quality}">
-                            ${analysis.sulfate.quality.toUpperCase()}
-                        </span>
+                    <div style="background: #f8f9fa; border-radius: 12px; padding: 15px; border-left: 4px solid #667eea;">
+                        <h4 style="color: #495057; font-size: 14px; margin-bottom: 8px;">⚪ Sulfate</h4>
+                        <div style="font-size: 22px; font-weight: 700; margin-bottom: 5px; color: #495057;">${allResults.sulfate.concentration}</div>
+                        <span class="quality-badge quality-${allResults.sulfate.quality}">${allResults.sulfate.quality.toUpperCase()}</span>
                     </div>
 
-                    <div class="parameter-card">
-                        <h4>💨 Ammonia Estimate</h4>
-                        <div class="parameter-value">${analysis.ammonia.value}</div>
-                        <div class="parameter-range">Safe Limit: 0.5 mg/L</div>
-                        <div class="parameter-desc">${analysis.ammonia.desc}</div>
-                        <span class="quality-badge quality-${analysis.ammonia.quality}">
-                            ${analysis.ammonia.quality.toUpperCase()}
-                        </span>
+                    <div style="background: #f8f9fa; border-radius: 12px; padding: 15px; border-left: 4px solid #667eea;">
+                        <h4 style="color: #495057; font-size: 14px; margin-bottom: 8px;">💨 Ammonia</h4>
+                        <div style="font-size: 22px; font-weight: 700; margin-bottom: 5px; color: #495569;">${allResults.ammonia.concentration}</div>
+                        <span class="quality-badge quality-${allResults.ammonia.quality}">${allResults.ammonia.quality.toUpperCase()}</span>
                     </div>
                 </div>
+            `;
+        }
 
-                <div class="scientific-summary">
-                    <h4>📋 Scientific Assessment</h4>
-                    <p><strong>Primary Indicators:</strong> Color analysis suggests ${analysis.colorCategory} water with pH ~${analysis.pH.value}. 
-                    ${analysis.pH.quality === 'poor' ? 'Immediate attention required due to extreme pH levels.' : 
-                      analysis.iron.quality === 'poor' ? 'Iron contamination detected - filtration recommended.' :
-                      'Visual indicators appear within acceptable ranges.'}</p>
-                    
-                    <p style="margin-top: 10px;"><strong>Recommended Actions:</strong> 
-                    ${analysis.pH.quality === 'poor' || analysis.iron.quality === 'poor' ? 
-                        'Professional water testing and treatment consultation required.' :
-                        'Consider periodic professional testing to verify dissolved contaminants not visible to the eye.'}</p>
+        function displayIndividualResult(testType, analysis) {
+            const result = calculateParameterValue(testType, analysis.colorCategory, analysis.rgb.r, analysis.rgb.g, analysis.rgb.b);
+            const colorHex = `rgb(${analysis.rgb.r}, ${analysis.rgb.g}, ${analysis.rgb.b})`;
+            
+            // Store result
+            testResults[testType] = {
+                ...result,
+                colorCategory: analysis.colorCategory,
+                rgb: analysis.rgb,
+                timestamp: new Date().toLocaleString()
+            };
+
+            const individualResultsDiv = document.getElementById('individualResults');
+            
+            const resultHtml = `
+                <div class="individual-result">
+                    <h4>${testInfo[testType].icon} ${testInfo[testType].title} - Complete</h4>
+                    <div class="result-details">
+                        <div>
+                            <div class="color-sample-small" style="background-color: ${colorHex}; margin-bottom: 10px;"></div>
+                            <p><strong>Color:</strong> ${analysis.colorCategory}</p>
+                            <p><strong>RGB:</strong> (${analysis.rgb.r}, ${analysis.rgb.g}, ${analysis.rgb.b})</p>
+                        </div>
+                        <div class="result-info">
+                            <p><strong>Result:</strong> ${result.value || result.concentration}</p>
+                            <p><strong>Quality:</strong> <span class="quality-badge quality-${result.quality}">${result.quality.toUpperCase()}</span></p>
+                            <p style="margin-top: 8px; font-size: 12px;">${result.desc}</p>
+                        </div>
+                    </div>
                 </div>
             `;
             
-            document.getElementById('loading').style.display = 'none';
-            resultsDiv.style.display = 'block';
+            individualResultsDiv.innerHTML += resultHtml;
             
-            // Highlight the detected color
-            highlightDetectedColor(analysis.colorCategory);
+            // Mark test as completed
+            document.getElementById('test' + testType.charAt(0).toUpperCase() + testType.slice(1)).classList.add('completed');
+            completedTests++;
+            
+            // Update progress
+            updateProgress();
+            
+            // Check if all tests completed
+            if (completedTests >= 4) {
+                document.getElementById('viewSummaryBtn').style.display = 'inline-block';
+                document.getElementById('resetTestsBtn').style.display = 'inline-block';
+            }
         }
 
-        // Event listeners
+        function updateProgress() {
+            const progressPercent = (completedTests / 4) * 100;
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+            document.getElementById('progressText').textContent = `${completedTests}/4 tests completed`;
+        }
+
+        function showFinalSummary() {
+            const summaryGrid = document.getElementById('summaryGrid');
+            const overallRating = document.getElementById('overallRating');
+            
+            // Calculate overall quality score
+            let totalScore = 0;
+            let scoreCount = 0;
+            const qualityScores = { excellent: 4, good: 3, fair: 2, poor: 1 };
+            
+            let summaryHtml = '';
+            Object.keys(testResults).forEach(testType => {
+                const result = testResults[testType];
+                const score = qualityScores[result.quality] || 2;
+                totalScore += score;
+                scoreCount++;
+                
+                summaryHtml += `
+                    <div class="summary-card ${result.quality}">
+                        <h4>${testInfo[testType].icon} ${testInfo[testType].title}</h4>
+                        <div class="summary-value">${result.value || result.concentration}</div>
+                        <span class="quality-badge quality-${result.quality}">${result.quality.toUpperCase()}</span>
+                    </div>
+                `;
+            });
+            
+            summaryGrid.innerHTML = summaryHtml;
+            
+            // Calculate overall rating
+            const avgScore = totalScore / scoreCount;
+            let overallQuality, overallText, recommendation;
+            
+            if (avgScore >= 3.5) {
+                overallQuality = 'excellent';
+                overallText = 'EXCELLENT';
+                recommendation = 'Water quality appears very good based on visual indicators. Continue regular monitoring.';
+            } else if (avgScore >= 2.5) {
+                overallQuality = 'good';
+                overallText = 'GOOD';
+                recommendation = 'Water quality is generally acceptable. Consider periodic professional testing.';
+            } else if (avgScore >= 1.5) {
+                overallQuality = 'fair';
+                overallText = 'FAIR';
+                recommendation = 'Some parameters show concern. Professional testing recommended for verification.';
+            } else {
+                overallQuality = 'poor';
+                overallText = 'POOR';
+                recommendation = 'Multiple parameters indicate potential issues. Immediate professional water testing strongly recommended.';
+            }
+            
+            overallRating.className = `overall-rating ${overallQuality}`;
+            document.getElementById('overallScore').textContent = overallText;
+            document.getElementById('overallRecommendation').textContent = recommendation;
+            
+            document.getElementById('finalSummary').classList.add('show');
+        }
+
+        function resetCurrentTest() {
+            document.getElementById('preview').style.display = 'none';
+            document.getElementById('video').style.display = 'block';
+            document.getElementById('overlay').style.display = 'flex';
+            document.getElementById('captureBtn').style.display = 'block';
+            document.getElementById('retakeBtn').style.display = 'none';
+            document.getElementById('results').classList.remove('show');
+        }
+
+        function resetAllTests() {
+            testResults = {};
+            completedTests = 0;
+            currentTest = null;
+            
+            // Reset UI
+            document.querySelectorAll('.test-btn').forEach(btn => {
+                btn.classList.remove('active', 'completed');
+            });
+            
+            document.getElementById('individualResults').innerHTML = '';
+            document.getElementById('currentTestInfo').style.display = 'none';
+            document.getElementById('viewSummaryBtn').style.display = 'none';
+            document.getElementById('resetTestsBtn').style.display = 'none';
+            document.getElementById('finalSummary').classList.remove('show');
+            
+            updateProgress();
+            resetCurrentTest();
+        }
+
+        // Event Listeners
+        document.getElementById('quickModeBtn').addEventListener('click', () => switchMode('quick'));
+        document.getElementById('individualModeBtn').addEventListener('click', () => switchMode('individual'));
+
+        document.querySelectorAll('.test-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!btn.classList.contains('completed')) {
+                    selectTest(btn.dataset.test);
+                }
+            });
+        });
+
         document.getElementById('captureBtn').addEventListener('click', async () => {
             if (!video.srcObject) {
                 alert('Camera not available');
                 return;
             }
             
-            // Turn off flash during capture to prevent overexposure
             if (flashEnabled && track && flashSupported) {
-                await track.applyConstraints({
-                    advanced: [{ torch: false }]
-                });
+                await track.applyConstraints({ advanced: [{ torch: false }] });
             }
             
-            // Create canvas and capture image
             canvas = document.createElement('canvas');
             context = canvas.getContext('2d');
             canvas.width = video.videoWidth;
@@ -847,7 +1081,6 @@
             
             const imageData = canvas.toDataURL('image/jpeg');
             
-            // Show preview
             const preview = document.getElementById('preview');
             preview.src = imageData;
             preview.style.display = 'block';
@@ -857,44 +1090,40 @@
             document.getElementById('captureBtn').style.display = 'none';
             document.getElementById('retakeBtn').style.display = 'block';
             
-            // Show results section with loading
             const results = document.getElementById('results');
             results.classList.add('show');
             document.getElementById('loading').style.display = 'block';
             document.getElementById('analysis').style.display = 'none';
             
-            // Turn flash back on if it was enabled
             if (flashEnabled && track && flashSupported) {
                 setTimeout(async () => {
-                    await track.applyConstraints({
-                        advanced: [{ torch: true }]
-                    });
+                    await track.applyConstraints({ advanced: [{ torch: true }] });
                 }, 100);
             }
             
-            // Analyze with enhanced scientific method
             setTimeout(async () => {
                 const analysis = await analyzeImage(imageData);
-                displayResults(analysis);
-            }, 2500);
+                
+                if (currentMode === 'quick') {
+                    displayQuickResults(analysis);
+                    document.getElementById('analysis').style.display = 'block';
+                } else {
+                    displayIndividualResult(currentTest, analysis);
+                }
+                
+                document.getElementById('loading').style.display = 'none';
+            }, 2000);
         });
 
-        document.getElementById('retakeBtn').addEventListener('click', () => {
-            document.getElementById('preview').style.display = 'none';
-            document.getElementById('video').style.display = 'block';
-            document.getElementById('overlay').style.display = 'flex';
-            document.getElementById('captureBtn').style.display = 'block';
-            document.getElementById('retakeBtn').style.display = 'none';
-            document.getElementById('results').classList.remove('show');
-            
-            // Reset color highlights
-            const colorPills = document.querySelectorAll('.color-pill');
-            colorPills.forEach(pill => pill.classList.remove('active'));
-        });
-
+        document.getElementById('retakeBtn').addEventListener('click', resetCurrentTest);
         document.getElementById('flashBtn').addEventListener('click', toggleFlash);
+        document.getElementById('viewSummaryBtn').addEventListener('click', showFinalSummary);
+        document.getElementById('resetTestsBtn').addEventListener('click', resetAllTests);
+        document.getElementById('startOverBtn').addEventListener('click', () => {
+            resetAllTests();
+            switchMode('individual');
+        });
 
-        // Initialize camera on page load
         window.addEventListener('load', initCamera);
     </script>
 </body>
