@@ -302,6 +302,28 @@
             margin: 0 auto 15px;
         }
 
+        .detected-colors {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+            justify-content: center;
+        }
+
+        .color-pill {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .color-pill.active {
+            background: #667eea;
+            color: white;
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -409,6 +431,20 @@
                 <button class="btn btn-primary" id="captureBtn">🔬 Analyze Sample</button>
                 <button class="btn btn-secondary" id="retakeBtn" style="display: none;">📷 New Sample</button>
             </div>
+            
+            <div class="detected-colors" id="colorPills">
+                <div class="color-pill">Red</div>
+                <div class="color-pill">Orange</div>
+                <div class="color-pill">Yellow</div>
+                <div class="color-pill">Green</div>
+                <div class="color-pill">Blue</div>
+                <div class="color-pill">Purple</div>
+                <div class="color-pill">Brown</div>
+                <div class="color-pill">Clear</div>
+                <div class="color-pill">Gray</div>
+                <div class="color-pill">Black</div>
+                <div class="color-pill">White</div>
+            </div>
         </div>
 
         <div class="results" id="results">
@@ -435,16 +471,27 @@
                 red: { value: 2.5, range: '1.0-3.0', quality: 'poor', desc: 'Strongly acidic - acid mine drainage or industrial contamination' },
                 orange: { value: 3.8, range: '3.1-4.4', quality: 'poor', desc: 'Acidic - iron oxidation, methyl orange indicator range' },
                 yellow: { value: 5.2, range: '4.0-6.0', quality: 'fair', desc: 'Mildly acidic - natural organic matter or pollution' },
+                brown: { value: 5.8, range: '5.0-6.5', quality: 'fair', desc: 'Slightly acidic - often from tannins or organic matter' },
                 clear: { value: 7.0, range: '6.5-7.5', quality: 'excellent', desc: 'Neutral pH - optimal for most uses' },
                 green: { value: 7.0, range: '6.5-7.5', quality: 'good', desc: 'Near neutral - bromocresol green range' },
                 blue: { value: 8.5, range: '7.5-9.0', quality: 'good', desc: 'Alkaline - thymol blue indicator range' },
-                purple: { value: 10.0, range: '9.0-11.0', quality: 'poor', desc: 'Highly alkaline - phenolphthalein range' }
+                purple: { value: 10.0, range: '9.0-11.0', quality: 'poor', desc: 'Highly alkaline - phenolphthalein range' },
+                gray: { value: 6.8, range: '6.0-7.5', quality: 'fair', desc: 'Variable pH - requires further testing' },
+                black: { value: 5.5, range: '4.5-6.5', quality: 'poor', desc: 'Acidic - often indicates heavy metal contamination' },
+                white: { value: 7.2, range: '6.8-7.6', quality: 'good', desc: 'Near neutral - may indicate high mineral content' }
             },
             iron: {
                 clear: { concentration: '<0.1 mg/L', quality: 'excellent', desc: 'No visible iron contamination' },
                 yellow: { concentration: '0.3-1.0 mg/L', quality: 'fair', desc: 'Ferric hydroxide formation - pipe corrosion' },
                 orange: { concentration: '1.0-3.0 mg/L', quality: 'poor', desc: 'Significant iron precipitation - EPA secondary limit exceeded' },
-                red: { concentration: '3.0+ mg/L', quality: 'poor', desc: 'High iron contamination - treatment required' }
+                red: { concentration: '3.0+ mg/L', quality: 'poor', desc: 'High iron contamination - treatment required' },
+                brown: { concentration: '2.0-5.0 mg/L', quality: 'poor', desc: 'High iron with organic matter - treatment required' },
+                green: { concentration: '0.1-0.5 mg/L', quality: 'good', desc: 'Low iron - possibly from copper corrosion' },
+                blue: { concentration: '<0.1 mg/L', quality: 'excellent', desc: 'No iron detected' },
+                purple: { concentration: '<0.1 mg/L', quality: 'excellent', desc: 'No iron detected' },
+                gray: { concentration: '0.5-2.0 mg/L', quality: 'fair', desc: 'Moderate iron content' },
+                black: { concentration: '5.0+ mg/L', quality: 'poor', desc: 'Very high iron or manganese content' },
+                white: { concentration: '<0.1 mg/L', quality: 'excellent', desc: 'No iron detected' }
             }
         };
 
@@ -474,33 +521,47 @@
             const maxColor = Math.max(r, g, b);
             const minColor = Math.min(r, g, b);
             const saturation = maxColor === 0 ? 0 : (maxColor - minColor) / maxColor;
+            const colorDiff = maxColor - minColor;
 
-            // Clear/colorless water
-            if (saturation < 0.15 && brightness > 180) return 'clear';
-            
-            // Determine dominant color
-            if (r > g + 30 && r > b + 30) {
-                if (g > b + 15) return 'orange';  // Red + some green = orange
-                return 'red';
-            } else if (g > r + 20 && g > b + 20) {
-                return 'green';
-            } else if (b > r + 20 && b > g + 20) {
-                return 'blue';
-            } else if (r > 150 && g > 100 && b < 100) {
-                return 'yellow';
-            } else if (r > g && r > b && b > g) {
-                return 'purple';
+            // First check for black, white and gray
+            if (saturation < 0.1) {
+                if (brightness < 50) return 'black';
+                if (brightness > 200) return 'white';
+                return 'gray';
             }
             
-            return brightness > 150 ? 'clear' : 'gray';
+            // Clear/colorless water (light with low saturation)
+            if (saturation < 0.15 && brightness > 180) return 'clear';
+            
+            // Determine dominant color with better thresholds
+            if (r > g + 40 && r > b + 40) {
+                // Check for brown (dark orange/red)
+                if (brightness < 120 && g > b && (r - g) < 60) return 'brown';
+                if (g > b + 20) return 'orange';  // Red + some green = orange
+                return 'red';
+            } else if (g > r + 30 && g > b + 30) {
+                return 'green';
+            } else if (b > r + 30 && b > g + 30) {
+                return 'blue';
+            } else if (r > 150 && g > 120 && b < 100) {
+                return 'yellow';
+            } else if (r > g && b > g && colorDiff > 50) {
+                // Check for purple vs brown
+                if (brightness < 130) return 'brown';
+                return 'purple';
+            } else if (r > 120 && g > 100 && b > 100 && Math.abs(r-g) < 30 && Math.abs(r-b) < 30) {
+                return 'gray';
+            }
+            
+            return 'gray';
         }
 
         function calculateScientificValues(colorCategory, r, g, b) {
             // Get pH from scientific database
-            const pHData = scientificData.pH[colorCategory] || scientificData.pH.clear;
+            const pHData = scientificData.pH[colorCategory] || scientificData.pH.gray;
             
             // Get iron content
-            const ironData = scientificData.iron[colorCategory] || scientificData.iron.clear;
+            const ironData = scientificData.iron[colorCategory] || scientificData.iron.gray;
             
             // Calculate sulfate based on pH correlation (scientific relationship)
             let sulfateValue, sulfateQuality, sulfateDesc;
@@ -544,6 +605,16 @@
             };
         }
 
+        function highlightDetectedColor(colorCategory) {
+            const colorPills = document.querySelectorAll('.color-pill');
+            colorPills.forEach(pill => {
+                pill.classList.remove('active');
+                if (pill.textContent.toLowerCase() === colorCategory.toLowerCase()) {
+                    pill.classList.add('active');
+                }
+            });
+        }
+
         function analyzeImage(imageData) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
@@ -579,10 +650,8 @@
                     const avgG = totalG / pixelCount;
                     const avgB = totalB / pixelCount;
                     
-                    const analysis = calculateScientificValues(
-                        determineColorCategory(avgR, avgG, avgB),
-                        avgR, avgG, avgB
-                    );
+                    const colorCategory = determineColorCategory(avgR, avgG, avgB);
+                    const analysis = calculateScientificValues(colorCategory, avgR, avgG, avgB);
                     
                     resolve(analysis);
                 };
@@ -662,6 +731,9 @@
             
             document.getElementById('loading').style.display = 'none';
             resultsDiv.style.display = 'block';
+            
+            // Highlight the detected color
+            highlightDetectedColor(analysis.colorCategory);
         }
 
         // Event listeners using exact same working code structure
@@ -710,6 +782,10 @@
             document.getElementById('captureBtn').style.display = 'block';
             document.getElementById('retakeBtn').style.display = 'none';
             document.getElementById('results').classList.remove('show');
+            
+            // Reset color highlights
+            const colorPills = document.querySelectorAll('.color-pill');
+            colorPills.forEach(pill => pill.classList.remove('active'));
         });
 
         // Initialize camera on page load - same as working version
