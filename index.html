@@ -17,46 +17,6 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            cursor: default;
-        }
-
-        /* Add custom cursor for targeting */
-        .targeting-cursor {
-            cursor: none;
-        }
-
-        .targeting-box {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #fff;
-            border-radius: 2px;
-            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
-            pointer-events: none;
-            z-index: 1000;
-            display: none;
-        }
-
-        .targeting-box::before, .targeting-box::after {
-            content: '';
-            position: absolute;
-            background: #fff;
-        }
-
-        .targeting-box::before {
-            width: 2px;
-            height: 8px;
-            left: 50%;
-            top: -10px;
-            transform: translateX(-50%);
-        }
-
-        .targeting-box::after {
-            width: 8px;
-            height: 2px;
-            top: 50%;
-            left: -10px;
-            transform: translateY(-50%);
         }
 
         .header {
@@ -256,6 +216,44 @@
             text-align: center;
             background: rgba(0, 0, 0, 0.3);
             pointer-events: none;
+        }
+
+        /* Fixed targeting cursor at center */
+        .targeting-cursor {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid #fff;
+            border-radius: 2px;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+        }
+
+        .targeting-cursor::before, .targeting-cursor::after {
+            content: '';
+            position: absolute;
+            background: #fff;
+        }
+
+        .targeting-cursor::before {
+            width: 2px;
+            height: 8px;
+            left: 50%;
+            top: -10px;
+            transform: translateX(-50%);
+        }
+
+        .targeting-cursor::after {
+            width: 8px;
+            height: 2px;
+            top: 50%;
+            left: -10px;
+            transform: translateY(-50%);
         }
 
         .controls {
@@ -549,8 +547,6 @@
     </style>
 </head>
 <body>
-    <div class="targeting-box" id="targetingBox"></div>
-    
     <div class="header">
         <h1>🧪 ColorAqua</h1>
         <p>Scientific Water Quality Analysis System</p>
@@ -611,6 +607,7 @@
                 <div class="camera-overlay" id="overlay">
                     <div>Click "Start Camera" to begin<br><strong>Camera access required</strong></div>
                 </div>
+                <div class="targeting-cursor" id="targetingCursor"></div>
             </div>
 
             <div class="controls">
@@ -751,9 +748,8 @@
                     document.getElementById('startCameraBtn').style.display = 'none';
                     document.getElementById('captureBtn').style.display = 'inline-block';
                     
-                    // Enable targeting cursor
-                    document.body.classList.add('targeting-cursor');
-                    document.getElementById('targetingBox').style.display = 'block';
+                    // Show the fixed targeting cursor
+                    document.getElementById('targetingCursor').style.display = 'block';
                     
                     // Check for flash support
                     track = stream.getVideoTracks()[0];
@@ -768,12 +764,6 @@
                 document.getElementById('overlay').innerHTML = `<div>Camera access denied<br><strong>Error: ${error.message}</strong><br>Please allow camera permissions and refresh</div>`;
                 document.getElementById('startCameraBtn').textContent = '🔄 Retry Camera';
             }
-        }
-
-        function updateTargetingBox(e) {
-            const targetingBox = document.getElementById('targetingBox');
-            targetingBox.style.left = (e.clientX - 10) + 'px';
-            targetingBox.style.top = (e.clientY - 10) + 'px';
         }
 
         async function toggleFlash() {
@@ -897,7 +887,7 @@
                     canvas.height = img.height;
                     ctx.drawImage(img, 0, 0);
                     
-                    // Get the center of the image for sampling
+                    // Sample from the center of the image (where the targeting cursor is)
                     const centerX = img.width / 2;
                     const centerY = img.height / 2;
                     const sampleSize = 60;
@@ -947,7 +937,7 @@
                     <div style="width: 60px; height: 60px; border-radius: 50%; border: 3px solid #dee2e6; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); background-color: ${colorHex};"></div>
                     <div>
                         <h3 style="color: #495057; font-size: 16px; margin-bottom: 5px;">Detected: ${analysis.colorCategory.charAt(0).toUpperCase() + analysis.colorCategory.slice(1)} Water</h3>
-                        <p style="color: 6c757d; font-size: 12px;">RGB: (${analysis.rgb.r}, ${analysis.rgb.g}, ${analysis.rgb.b})</p>
+                        <p style="color: #6c757d; font-size: 12px;">RGB: (${analysis.rgb.r}, ${analysis.rgb.g}, ${analysis.rgb.b})</p>
                     </div>
                 </div>
 
@@ -1088,8 +1078,7 @@
             document.getElementById('video').style.display = 'block';
             if (stream) {
                 document.getElementById('overlay').style.display = 'flex';
-                document.body.classList.add('targeting-cursor');
-                document.getElementById('targetingBox').style.display = 'block';
+                document.getElementById('targetingCursor').style.display = 'block';
             }
             document.getElementById('captureBtn').style.display = stream ? 'inline-block' : 'none';
             document.getElementById('retakeBtn').style.display = 'none';
@@ -1155,12 +1144,9 @@
             video.style.display = 'none';
             
             document.getElementById('overlay').style.display = 'none';
-            document.getElementById('targetingBox').style.display = 'none';
+            document.getElementById('targetingCursor').style.display = 'none';
             document.getElementById('captureBtn').style.display = 'none';
             document.getElementById('retakeBtn').style.display = 'inline-block';
-            
-            // Remove targeting cursor
-            document.body.classList.remove('targeting-cursor');
             
             const results = document.getElementById('results');
             results.classList.add('show');
@@ -1197,9 +1183,6 @@
             resetAllTests();
             switchMode('individual');
         });
-
-        // Add mouse move listener for targeting box
-        document.addEventListener('mousemove', updateTargetingBox);
 
         // Initialize on page load
         window.addEventListener('load', () => {
