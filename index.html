@@ -788,4 +788,361 @@
             }
         }
 
-        function determineColor
+        function determineColorCategory(r, g, b) {
+            const brightness = (r + g + b) / 3;
+            const maxColor = Math.max(r, g, b);
+            const minColor = Math.min(r, g, b);
+            const saturation = maxColor === 0 ? 0 : (maxColor - minColor) / maxColor;
+
+            // Better color classification with more distinct ranges
+            if (saturation < 0.15) {
+                if (brightness < 40) return 'black';
+                if (brightness > 220) return 'white';
+                if (brightness < 100) return 'gray';
+                return 'clear';
+            }
+            
+            // More precise color detection for better pH differentiation
+            const redDominance = r - Math.max(g, b);
+            const greenDominance = g - Math.max(r, b);
+            const blueDominance = b - Math.max(r, g);
+            
+            if (redDominance > 30) {
+                if (g > b + 20 && brightness > 120) return 'orange';
+                if (brightness < 80 && g > 50) return 'brown';
+                return 'red';
+            } else if (greenDominance > 30) {
+                return 'green';
+            } else if (blueDominance > 30) {
+                return 'blue';
+            } else if (r > 150 && g > 130 && b < 80) {
+                return 'yellow';
+            } else if (r > g + 10 && b > g + 10 && Math.abs(r - b) < 30) {
+                if (brightness > 150) return 'purple';
+                return 'brown';
+            }
+            
+            return 'gray';
+        }
+
+        function calculateParameterValue(testType, colorCategory, r, g, b) {
+            const data = scientificData[testType];
+            if (!data || !data[colorCategory]) {
+                return { value: 'Unknown', quality: 'fair', desc: 'Unable to determine from color analysis', concentration: 'Unknown' };
+            }
+            return data[colorCategory];
+        }
+
+        function analyzeImage(imageData) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            return new Promise((resolve) => {
+                img.onload = function() {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    
+                    const centerX = img.width / 2;
+                    const centerY = img.height / 2;
+                    const sampleSize = 60;
+                    
+                    let totalR = 0, totalG = 0, totalB = 0, pixelCount = 0;
+                    
+                    // Sample multiple areas for better accuracy
+                    for (let x = centerX - sampleSize; x < centerX + sampleSize; x += 4) {
+                        for (let y = centerY - sampleSize; y < centerY + sampleSize; y += 4) {
+                            if (x >= 0 && x < img.width && y >= 0 && y < img.height) {
+                                const pixel = ctx.getImageData(x, y, 1, 1).data;
+                                totalR += pixel[0];
+                                totalG += pixel[1];
+                                totalB += pixel[2];
+                                pixelCount++;
+                            }
+                        }
+                    }
+                    
+                    const avgR = Math.round(totalR / pixelCount);
+                    const avgG = Math.round(totalG / pixelCount);
+                    const avgB = Math.round(totalB / pixelCount);
+                    const colorCategory = determineColorCategory(avgR, avgG, avgB);
+                    
+                    resolve({
+                        colorCategory,
+                        rgb: { r: avgR, g: avgG, b: avgB }
+                    });
+                };
+                img.src = imageData;
+            });
+        }
+
+        function displayQuickResults(analysis) {
+            // Calculate all parameters for quick mode
+            const allResults = {
+                pH: calculateParameterValue('pH', analysis.colorCategory, analysis.rgb.r, analysis.rgb.g, analysis.rgb.b),
+                sulfate: calculateParameterValue('sulfate', analysis.colorCategory, analysis.rgb.r, analysis.rgb.g, analysis.rgb.b),
+                ammonia: calculateParameterValue('ammonia', analysis.colorCategory, analysis.rgb.r, analysis.rgb.g, analysis.rgb.b)
+            };
+
+            const resultsDiv = document.getElementById('analysis');
+            const colorHex = `rgb(${analysis.rgb.r}, ${analysis.rgb.g}, ${analysis.rgb.b})`;
+            
+            resultsDiv.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 12px;">
+                    <div style="width: 60px; height: 60px; border-radius: 50%; border: 3px solid #dee2e6; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); background-color: ${colorHex};"></div>
+                    <div>
+                        <h3 style="color: #495057; font-size: 16px; margin-bottom: 5px;">Detected: ${analysis.colorCategory.charAt(0).toUpperCase() + analysis.colorCategory.slice(1)} Water</h3>
+                        <p style="color: #6c757d; font-size: 12px;">RGB: (${analysis.rgb.r}, ${analysis.rgb.g}, ${analysis.rgb.b})</p>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <div style="background: #f8f9fa; border-radius: 12px; padding: 15px; border-left: 4px solid #667eea;">
+                        <h4 style="color: #495057; font-size: 14px; margin-bottom: 8px;">🌡️ pH Level</h4>
+                        <div style="font-size: 22px; font-weight: 700; margin-bottom: 5px; color: #495057;">${allResults.pH.value}</div>
+                        <span class="quality-badge quality-${allResults.pH.quality}">${allResults.pH.quality.toUpperCase()}</span>
+                    </div>
+
+                    <div style="background: #f8f9fa; border-radius: 12px; padding: 15px; border-left: 4px solid #667eea;">
+                        <h4 style="color: #495057; font-size: 14px; margin-bottom: 8px;">⚪ Sulfate</h4>
+                        <div style="font-size: 22px; font-weight: 700; margin-bottom: 5px; color: #495057;">${allResults.sulfate.concentration}</div>
+                        <span class="quality-badge quality-${allResults.sulfate.quality}">${allResults.sulfate.quality.toUpperCase()}</span>
+                    </div>
+
+                    <div style="background: #f8f9fa; border-radius: 12px; padding: 15px; border-left: 4px solid #667eea;">
+                        <h4 style="color: #495057; font-size: 14px; margin-bottom: 8px;">💨 Ammonia</h4>
+                        <div style="font-size: 22px; font-weight: 700; margin-bottom: 5px; color: #495057;">${allResults.ammonia.concentration}</div>
+                        <span class="quality-badge quality-${allResults.ammonia.quality}">${allResults.ammonia.quality.toUpperCase()}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayIndividualResult(testType, analysis) {
+            const result = calculateParameterValue(testType, analysis.colorCategory, analysis.rgb.r, analysis.rgb.g, analysis.rgb.b);
+            const colorHex = `rgb(${analysis.rgb.r}, ${analysis.rgb.g}, ${analysis.rgb.b})`;
+            
+            // Store result
+            testResults[testType] = {
+                ...result,
+                colorCategory: analysis.colorCategory,
+                rgb: analysis.rgb,
+                timestamp: new Date().toLocaleString()
+            };
+
+            const individualResultsDiv = document.getElementById('individualResults');
+            
+            const resultHtml = `
+                <div class="individual-result">
+                    <h4>${testInfo[testType].icon} ${testInfo[testType].title} - Complete</h4>
+                    <div class="result-details">
+                        <div>
+                            <div class="color-sample-small" style="background-color: ${colorHex}; margin-bottom: 10px;"></div>
+                            <p><strong>Color:</strong> ${analysis.colorCategory}</p>
+                            <p><strong>RGB:</strong> (${analysis.rgb.r}, ${analysis.rgb.g}, ${analysis.rgb.b})</p>
+                        </div>
+                        <div class="result-info">
+                            <p><strong>Result:</strong> ${result.value || result.concentration}</p>
+                            <p><strong>Quality:</strong> <span class="quality-badge quality-${result.quality}">${result.quality.toUpperCase()}</span></p>
+                            <p style="margin-top: 8px; font-size: 12px;">${result.desc}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            individualResultsDiv.innerHTML += resultHtml;
+            
+            // Mark test as completed
+            document.getElementById('test' + testType.charAt(0).toUpperCase() + testType.slice(1)).classList.add('completed');
+            completedTests++;
+            
+            // Update progress
+            updateProgress();
+            
+            // Check if all tests completed
+            if (completedTests >= 3) {
+                document.getElementById('viewSummaryBtn').style.display = 'inline-block';
+                document.getElementById('resetTestsBtn').style.display = 'inline-block';
+            }
+        }
+
+        function updateProgress() {
+            const progressPercent = (completedTests / 3) * 100;
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+            document.getElementById('progressText').textContent = `${completedTests}/3 tests completed`;
+        }
+
+        function showFinalSummary() {
+            const summaryGrid = document.getElementById('summaryGrid');
+            const overallRating = document.getElementById('overallRating');
+            
+            // Calculate overall quality score
+            let totalScore = 0;
+            let scoreCount = 0;
+            const qualityScores = { excellent: 4, good: 3, fair: 2, poor: 1 };
+            
+            let summaryHtml = '';
+            Object.keys(testResults).forEach(testType => {
+                const result = testResults[testType];
+                const score = qualityScores[result.quality] || 2;
+                totalScore += score;
+                scoreCount++;
+                
+                summaryHtml += `
+                    <div class="summary-card ${result.quality}">
+                        <h4>${testInfo[testType].icon} ${testInfo[testType].title}</h4>
+                        <div class="summary-value">${result.value || result.concentration}</div>
+                        <span class="quality-badge quality-${result.quality}">${result.quality.toUpperCase()}</span>
+                    </div>
+                `;
+            });
+            
+            summaryGrid.innerHTML = summaryHtml;
+            
+            // Calculate overall rating
+            const avgScore = totalScore / scoreCount;
+            let overallQuality, overallText, recommendation;
+            
+            if (avgScore >= 3.5) {
+                overallQuality = 'excellent';
+                overallText = 'EXCELLENT';
+                recommendation = 'Water quality appears very good based on visual indicators. Continue regular monitoring.';
+            } else if (avgScore >= 2.5) {
+                overallQuality = 'good';
+                overallText = 'GOOD';
+                recommendation = 'Water quality is generally acceptable. Consider periodic professional testing.';
+            } else if (avgScore >= 1.5) {
+                overallQuality = 'fair';
+                overallText = 'FAIR';
+                recommendation = 'Some parameters show concern. Professional testing recommended for verification.';
+            } else {
+                overallQuality = 'poor';
+                overallText = 'POOR';
+                recommendation = 'Multiple parameters indicate potential issues. Immediate professional water testing strongly recommended.';
+            }
+            
+            overallRating.className = `overall-rating ${overallQuality}`;
+            document.getElementById('overallScore').textContent = overallText;
+            document.getElementById('overallRecommendation').textContent = recommendation;
+            
+            document.getElementById('finalSummary').classList.add('show');
+        }
+
+        function resetCurrentTest() {
+            document.getElementById('preview').style.display = 'none';
+            document.getElementById('video').style.display = 'block';
+            if (stream) {
+                document.getElementById('overlay').style.display = 'flex';
+            }
+            document.getElementById('captureBtn').style.display = stream ? 'inline-block' : 'none';
+            document.getElementById('retakeBtn').style.display = 'none';
+            document.getElementById('results').classList.remove('show');
+        }
+
+        function resetAllTests() {
+            testResults = {};
+            completedTests = 0;
+            currentTest = null;
+            
+            // Reset UI
+            document.querySelectorAll('.test-btn').forEach(btn => {
+                btn.classList.remove('active', 'completed');
+            });
+            
+            document.getElementById('individualResults').innerHTML = '';
+            document.getElementById('currentTestInfo').style.display = 'none';
+            document.getElementById('viewSummaryBtn').style.display = 'none';
+            document.getElementById('resetTestsBtn').style.display = 'none';
+            document.getElementById('finalSummary').classList.remove('show');
+            
+            updateProgress();
+            resetCurrentTest();
+        }
+
+        // Event Listeners
+        document.getElementById('quickModeBtn').addEventListener('click', () => switchMode('quick'));
+        document.getElementById('individualModeBtn').addEventListener('click', () => switchMode('individual'));
+
+        document.getElementById('startCameraBtn').addEventListener('click', initCamera);
+
+        document.querySelectorAll('.test-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!btn.classList.contains('completed')) {
+                    selectTest(btn.dataset.test);
+                }
+            });
+        });
+
+        document.getElementById('captureBtn').addEventListener('click', async () => {
+            if (!stream || !video.srcObject) {
+                alert('Camera not available. Please start camera first.');
+                return;
+            }
+            
+            // Turn off flash before capture for consistent lighting
+            if (flashEnabled && track && flashSupported) {
+                await track.applyConstraints({ advanced: [{ torch: false }] });
+            }
+            
+            canvas = document.createElement('canvas');
+            context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0);
+            
+            const imageData = canvas.toDataURL('image/jpeg', 0.9);
+            
+            const preview = document.getElementById('preview');
+            preview.src = imageData;
+            preview.style.display = 'block';
+            video.style.display = 'none';
+            
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('captureBtn').style.display = 'none';
+            document.getElementById('retakeBtn').style.display = 'inline-block';
+            
+            const results = document.getElementById('results');
+            results.classList.add('show');
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('analysis').style.display = 'none';
+            
+            // Restore flash if it was on
+            if (flashEnabled && track && flashSupported) {
+                setTimeout(async () => {
+                    await track.applyConstraints({ advanced: [{ torch: true }] });
+                }, 100);
+            }
+            
+            // Simulate analysis time and process image
+            setTimeout(async () => {
+                const analysis = await analyzeImage(imageData);
+                
+                if (currentMode === 'quick') {
+                    displayQuickResults(analysis);
+                    document.getElementById('analysis').style.display = 'block';
+                } else {
+                    displayIndividualResult(currentTest, analysis);
+                }
+                
+                document.getElementById('loading').style.display = 'none';
+            }, 2000);
+        });
+
+        document.getElementById('retakeBtn').addEventListener('click', resetCurrentTest);
+        document.getElementById('flashBtn').addEventListener('click', toggleFlash);
+        document.getElementById('viewSummaryBtn').addEventListener('click', showFinalSummary);
+        document.getElementById('resetTestsBtn').addEventListener('click', resetAllTests);
+        document.getElementById('startOverBtn').addEventListener('click', () => {
+            resetAllTests();
+            switchMode('individual');
+        });
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            // Don't auto-start camera, let user click to start
+            console.log('ColorAqua Water Analysis System loaded');
+        });
+    </script>
+</body>
+</html>
