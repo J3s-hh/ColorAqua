@@ -566,14 +566,15 @@
                 <video id="video" autoplay muted playsinline></video>
                 <img id="preview" alt="Captured water sample">
                 <div class="camera-overlay" id="overlay">
-                    <div>Position test tube in frame<br><strong>Ensure good lighting for accurate analysis</strong></div>
+                    <div>Click "Start Camera" to begin<br><strong>Camera access required</strong></div>
                 </div>
             </div>
 
             <div class="controls">
-                <button class="btn btn-primary" id="captureBtn">🔬 Analyze Sample</button>
+                <button class="btn btn-primary" id="startCameraBtn">📹 Start Camera</button>
+                <button class="btn btn-primary" id="captureBtn" style="display: none;">🔬 Analyze Sample</button>
                 <button class="btn btn-secondary" id="retakeBtn" style="display: none;">📷 Retake</button>
-                <button class="btn btn-flash" id="flashBtn">🔦 Flash Off</button>
+                <button class="btn btn-flash" id="flashBtn" style="display: none;">🔦 Flash Off</button>
             </div>
         </div>
 
@@ -619,7 +620,7 @@
         let stream = null;
         let flashEnabled = false;
         let track = null;
-        let flashSupported = true;
+        let flashSupported = false;
         let currentMode = 'quick';
         let currentTest = null;
         let testResults = {};
@@ -643,7 +644,7 @@
             }
         };
 
-        // Improved scientific database with better pH differentiation
+        // Improved scientific database with better pH differentiation and no iron
         const scientificData = {
             pH: {
                 red: { value: 2.0, range: '1.0-2.5', quality: 'poor', desc: 'Strongly acidic - methyl red indicator, possible acid contamination' },
@@ -690,21 +691,35 @@
             video = document.getElementById('video');
             
             try {
-                stream = await navigator.mediaDevices.getUserMedia({
+                const constraints = {
                     video: {
                         facingMode: { ideal: 'environment' },
                         width: { ideal: 1280 },
                         height: { ideal: 720 }
                     }
+                };
+
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = stream;
+                
+                // Wait for video to be ready
+                video.addEventListener('loadedmetadata', () => {
+                    document.getElementById('overlay').innerHTML = '<div>Position test tube in frame<br><strong>Ensure good lighting for accurate analysis</strong></div>';
+                    document.getElementById('startCameraBtn').style.display = 'none';
+                    document.getElementById('captureBtn').style.display = 'inline-block';
+                    
+                    // Check for flash support
+                    track = stream.getVideoTracks()[0];
+                    if (track && track.getCapabilities().torch) {
+                        flashSupported = true;
+                        document.getElementById('flashBtn').style.display = 'inline-block';
+                    }
                 });
                 
-                video.srcObject = stream;
-                document.getElementById('overlay').style.display = 'flex';
-                track = stream.getVideoTracks()[0];
-                
             } catch (error) {
-                console.error('Camera access denied:', error);
-                document.getElementById('overlay').innerHTML = '<div>Camera access required<br>Please allow camera permissions</div>';
+                console.error('Camera access error:', error);
+                document.getElementById('overlay').innerHTML = `<div>Camera access denied<br><strong>Error: ${error.message}</strong><br>Please allow camera permissions and refresh</div>`;
+                document.getElementById('startCameraBtn').textContent = '🔄 Retry Camera';
             }
         }
 
@@ -724,7 +739,7 @@
                     document.getElementById('flashBtn').innerHTML = '🔦 Flash On';
                 }
             } catch (error) {
-                console.error('Error toggling flash:', error);
+                console.error('Flash toggle error:', error);
                 flashSupported = false;
                 document.getElementById('flashBtn').style.display = 'none';
             }
@@ -767,22 +782,10 @@
             document.getElementById('currentTestTitle').innerHTML = `${info.icon} ${info.title}`;
             document.getElementById('currentTestDesc').textContent = info.description;
             
-            // Update overlay text
-            document.getElementById('overlay').innerHTML = `<div>Position ${testType.toUpperCase()} test tube in frame<br><strong>Ensure reagent is mixed and lighting is good</strong></div>`;
+            // Update overlay text if camera is active
+            if (stream) {
+                document.getElementById('overlay').innerHTML = `<div>Position ${testType.toUpperCase()} test tube in frame<br><strong>Ensure reagent is mixed and lighting is good</strong></div>`;
+            }
         }
 
-        function determineColorCategory(r, g, b) {
-            const brightness = (r + g + b) / 3;
-            const maxColor = Math.max(r, g, b);
-            const minColor = Math.min(r, g, b);
-            const saturation = maxColor === 0 ? 0 : (maxColor - minColor) / maxColor;
-
-            // Better color classification with more distinct ranges
-            if (saturation < 0.1) {
-                if (brightness < 40) return 'black';
-                if (brightness > 220) return 'white';
-                if (brightness < 100) return 'gray';
-                return 'clear';
-            }
-            
-            // More precise color
+        function determineColor
